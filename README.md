@@ -1,26 +1,54 @@
 # splitter
 
-    Usage: splitter [OPTIONS] [SPLITS]...
+splitter is a tiny tool to split a single-file dataset into several distinct parts, typically train, test, and dev.
 
-      Split a given file into distinct parts of given percentages.
+## Dependencies
 
-              splitter -d my_file train:80 test:20
+splitter requires Python 3, and the `click` library.
 
-      This creates two new files: my_file.train, containing 80% of the lines of
-      my_file, and my_file.test, containing the rest. When the fractions can't
-      exactly divide the file properly, the remaining samples are given to (one
-      of) the smaller split(s).
+## Tutorial
 
-    Options:
-      -d, --dataset FILENAME          Input file to split into sets  [required]
-      -s, --standard-splits           Split preset for train:80 test:10 dev:10
-      -m, --mode [line|paragraph|L|P]
-                                      Mode of sample boundary detection. line
-                                      means the samples are seperated by
-                                      linebreaks. paragraph means the samples are
-                                      seperated by empty lines.
-      -t, --trim-empty-lines          In paragraph mode, get rid of the empty
-                                      lines seperating the samples
-      --shuffle / --no-shuffle        Whether to shuffle the samples. On by
-                                      default.
-      --help                          Show this message and exit.
+    splitter -d dataset train:80 test:10 dev:10
+
+This creates three new files: `dataset.train,` containing roughly 80% of the
+lines from dataset, and `dataset.test`/`dataset.dev`, each containing about 10%
+of the lines. Because this setting is so common, there's a shortcut:
+
+    splitter -d dataset --standard-splits
+
+You can make this even shorter by using the shorthand `-s`, so one could also
+just write
+
+    splitter -sd dataset
+
+All the three above examples are equivalent.
+
+### Splits
+
+The names "test", "dev", and "train" are not special in any way (apart from
+being used by `--standard-splits`); you can use any names. You are also not
+limited to having three parts, you can specify two, or seven, or even one part
+(although that doesn't make much sense).
+
+The numbers have to sum up to 100. Because most datasets can't exactly be split
+as per the split specification, we give extra examples to (one of) the smallest
+dataset(s).
+
+
+### Modes and Options
+
+
+If your files aren't seperated by newlines but by _double newlines_ (i.e. empty
+lines), you can switch the `--mode` to `paragraph` (the default being `line`):
+
+    splitter -sd dataset --mode paragraph
+
+Instead of `paragraph`, you can use `P`, instead of `line` `L`.
+
+By default, examples are shuffled before being divided into parts. To disable
+that, use the switch `--no-shuffle`:
+
+    splitter -sd dataset --no-shuffle
+
+Finally, when in paragraph mode, there's an option to `--trim-empty-lines`,
+which will cause the output to remove the empty lines seperating examples.
